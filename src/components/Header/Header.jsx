@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
-import { StateContext, ActionContext } from "../../hooks";
-import AnchorLink from "react-anchor-link-smooth-scroll";
+import { StateContext } from "../../hooks";
 import "./Header.scss";
 import makeBlockie from "ethereum-blockies-base64";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
+  const location = useLocation();
   const { currentUser, nearConfig, wallet } = useContext(StateContext);
   const [dropdownActive, setDropdownActive] = useState(false);
 
@@ -20,9 +20,28 @@ const Header = () => {
   };
   console.log(currentUser);
   return (
-    <header className="header">
+    <header className="header" id="home">
+      {location.pathname === "/" && (
+        <div className="header-top-bar">
+          Built on{" "}
+          <a href="https://near.org/" target="_blank" rel="noopener noreferrer">
+            NEAR
+          </a>{" "}
+          &{" "}
+          <a
+            href="https://www.nucypher.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            NuCypher
+          </a>
+          .
+        </div>
+      )}
       <div className="header-bar">
-        <div className="header-app-icon">PWPEvents.</div>
+        <Link className="header-app-icon" to="/">
+          PWPEvents.
+        </Link>
         <div className="header-action-button-container">
           <div className="header-tabs">
             <Link to="/">Home</Link>

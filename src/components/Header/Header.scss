@@ -1,6 +1,28 @@
 .header {
   box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.2);
   z-index: 10;
+  .header-top-bar {
+    height: 38px;
+    background-color: #ff8a004f;
+    border-bottom: 2px solid var(--themeColorDark);
+    text-align: center;
+    color: var(--themeColorDark);
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    a {
+      border-bottom: 1px dotted var(--deActive);
+      transition: 50ms ease-in-out;
+      margin: 0px 4px;
+      color: var(--deActive) !important;
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+  }
   .header-bar {
     display: flex;
     align-items: center;
@@ -10,7 +32,7 @@
     padding: 1em 0em;
     .header-app-icon {
       font-size: 32px;
-      color: var(--themeColorDark);
+      color: var(--themeColorDark) !important;
       font-weight: 800;
       font-family: var(--appNameFont);
       letter-spacing: 0.5px;

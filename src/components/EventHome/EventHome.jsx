@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 import React, { useState, useContext, useEffect } from "react";
 import { StateContext, ActionContext } from "../../hooks";
 import { Calendar, MapPin } from "react-feather";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import textVersion from "textversionjs";
 import "./EventHome.scss";
 import Big from "big.js";
@@ -113,7 +113,7 @@ const EventHome = () => {
                 <h3 className="event-list-item-title">{event.title}</h3>
                 <p className="event-list-item-description">
                   {textVersion(event.purpose).substring(0, 128)}...{" "}
-                  <a href="http://something.com">[Read More]</a>
+                  <Link to={`/events/${event.uuid}`}>[Read More]</Link>
                 </p>
                 <div className="event-list-item-progress-container">
                   <div

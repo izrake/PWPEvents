@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 import React, { useState, useContext, useEffect } from "react";
 import { StateContext, ActionContext } from "../../hooks";
 import { Calendar, Users } from "react-feather";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import textVersion from "textversionjs";
 import "./DonationHome.scss";
 import Big from "big.js";
@@ -93,7 +93,10 @@ const DonationHome = () => {
                 </h3>
                 <p className="donation-list-item-description">
                   {textVersion(donationEvent.purpose).substring(0, 128)}
-                  ... <a href="http://something.com">[Read More]</a>
+                  ...{" "}
+                  <Link to={`/donations/${donationEvent.uuid}`}>
+                    [Read More]
+                  </Link>
                 </p>
                 <div className="donation-list-item-progress-container">
                   <div

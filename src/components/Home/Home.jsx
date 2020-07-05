@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 import React, { useState, useContext, useEffect } from "react";
 import { StateContext, ActionContext } from "../../hooks";
 import { Calendar, MapPin } from "react-feather";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import textVersion from "textversionjs";
 import "./Home.scss";
 import Big from "big.js";
@@ -10,6 +10,7 @@ import { isJoined, isQuotaFilled } from "../../utils";
 import { NuCypherService } from "../../services";
 import Loader from "react-loader-spinner";
 import GeoCode from "react-geocode";
+import AnchorLink from "react-anchor-link-smooth-scroll";
 
 const BOATLOAD_OF_GAS = Big(1)
   .times(10 ** 16)
@@ -125,7 +126,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="home-container">
+      <div className="home-container" id="events">
         <div>
           <h2>Discover Recent Events</h2>
         </div>
@@ -136,7 +137,7 @@ const Home = () => {
                 <h3 className="event-list-item-title">{event.title}</h3>
                 <p className="event-list-item-description">
                   {textVersion(event.purpose).substring(0, 128)}...{" "}
-                  <a>[Read More]</a>
+                  <Link to={`/events/${event.uuid}`}>[Read More]</Link>
                 </p>
                 <div className="event-list-item-progress-container">
                   <div
@@ -215,6 +216,99 @@ const Home = () => {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="footer-section">
+        <div className="footer-container">
+          <div className="footer-app-section">
+            <h1 className="footer-app-name">PWPEvents.</h1>
+            <p>
+              Built with{" "}
+              <span role="img" aria-label="Purple heart">
+                💜
+              </span>{" "}
+              in{" "}
+              <a
+                href="https://github.com/izrake/PWPEvents"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="open-source"
+              >
+                open-source
+              </a>
+              .
+            </p>
+          </div>
+          <div className="footer-link-section">
+            <h3 className="footer-link-header">Quick Links</h3>
+            <ul className="footer-link-list">
+              <li className="footer-link-item">
+                <a
+                  className="footer-link"
+                  href="https://near.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  NEAR
+                </a>
+              </li>
+              <li className="footer-link-item">
+                <a
+                  className="footer-link"
+                  href="https://www.nucypher.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  NuCypher
+                </a>
+              </li>
+              {/* <li className="footer-link-item">
+                <a
+                  className="footer-link"
+                  href="https://www.arweave.org/get-involved/community"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Community
+                </a>
+              </li> */}
+              <li className="footer-link-item">
+                <a
+                  className="footer-link"
+                  href="https://github.com/izrake/PWPEvents/blob/master/README.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Learn more
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className="footer-link-section">
+            <h3 className="footer-link-header">Navigations</h3>
+            <ul className="footer-link-list">
+              <li className="footer-link-item">
+                <AnchorLink href="#home" className="footer-link">
+                  Home
+                </AnchorLink>
+              </li>
+              <li className="footer-link-item">
+                <Link to="/events" className="footer-link">
+                  Events
+                </Link>
+              </li>
+              <li className="footer-link-item">
+                <Link to="/donations" className="footer-link">
+                  Donations
+                </Link>
+              </li>
+              <li className="footer-link-item">
+                <Link to="/event-registration" className="footer-link">
+                  Create an Event
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </main>
   );
