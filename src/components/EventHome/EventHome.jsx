@@ -4,7 +4,7 @@ import { StateContext, ActionContext } from "../../hooks";
 import { Calendar, MapPin } from "react-feather";
 import { useHistory } from "react-router-dom";
 import textVersion from "textversionjs";
-import "./Home.scss";
+import "./EventHome.scss";
 import Big from "big.js";
 import { isJoined, isQuotaFilled } from "../../utils";
 import { NuCypherService } from "../../services";
@@ -14,7 +14,7 @@ const BOATLOAD_OF_GAS = Big(1)
   .times(10 ** 16)
   .toFixed();
 
-const Home = () => {
+const EventHome = () => {
   const history = useHistory();
   const { contract, currentUser, wallet, userDetails, events } = useContext(
     StateContext
@@ -68,30 +68,7 @@ const Home = () => {
   };
 
   return (
-    <main className="home">
-      <div className="home-header">
-        <div className="home-header-content">
-          <h1 className="home-header-content-title">Protest made private.</h1>
-          <p className="home-header-content-description">
-            Provide single platform for protest organizers to create events and
-            allow others to join the event without publishing the location.
-          </p>
-          <div className="home-header-button-container">
-            <button
-              className="home-header-explore-button"
-              onClick={(e) => history.push("/events")}
-            >
-              Explore Events
-            </button>
-            <button
-              className="home-header-start-button"
-              onClick={(e) => history.push("/event-registration")}
-            >
-              Start an Event
-            </button>
-          </div>
-        </div>
-      </div>
+    <main className="event-home">
       <div className="home-container">
         <div>
           <h2>Discover Near Events</h2>
@@ -103,7 +80,7 @@ const Home = () => {
                 <h3 className="event-list-item-title">{event.title}</h3>
                 <p className="event-list-item-description">
                   {textVersion(event.purpose).substring(0, 128)}...{" "}
-                  <a>[Read More]</a>
+                  <a href="http://something.com">[Read More]</a>
                 </p>
                 <div className="event-list-item-progress-container">
                   <div
@@ -187,4 +164,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default EventHome;

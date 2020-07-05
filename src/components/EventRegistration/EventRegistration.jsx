@@ -15,6 +15,7 @@ import { useHistory } from "react-router-dom";
 import Big from "big.js";
 import { NuCypherService } from "../../services";
 import Loader from "react-loader-spinner";
+import { store } from "react-notifications-component";
 
 const BOATLOAD_OF_GAS = Big(1)
   .times(10 ** 16)
@@ -36,45 +37,61 @@ const EventRegistration = () => {
   const [loader, setLoader] = useState(false);
 
   const submitEvent = async () => {
-    setLoader(true);
-    try {
-      const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
-      const enc_data = JSON.stringify({
-        address: eventAddress.toString(),
-        latitude: eventLatLng.lat.toString(),
-        longitude: eventLatLng.lng.toString(),
-      });
-      await NuCypherService.encryptData(
-        enc_data,
-        currentUser.accountId,
-        randomID
-      );
-      contract
-        .addEvent(
-          {
-            uuid: randomID,
-            title: eventTitle,
-            purpose: draftToHtml(
-              convertToRaw(eventPurpose.getCurrentContent())
-            ),
-            date: startDate.toString(),
-            minSubscribers: eventMinParticipant.toString(),
-            sender: currentUser.accountId,
-          },
-          BOATLOAD_OF_GAS
-        )
-        .catch((err) => {
-          console.log(err);
-          setLoader(false);
-        })
-        .then((data) => {
-          console.log(data);
-          setLoader(false);
-          history.push("/");
+    if (isEmptyField()) {
+      setLoader(true);
+      try {
+        const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
+        const enc_data = JSON.stringify({
+          address: eventAddress.toString(),
+          latitude: eventLatLng.lat.toString(),
+          longitude: eventLatLng.lng.toString(),
         });
-    } catch (err) {
-      console.error(err);
-      setLoader(false);
+        await NuCypherService.encryptData(
+          enc_data,
+          currentUser.accountId,
+          randomID
+        );
+        contract
+          .addEvent(
+            {
+              uuid: randomID,
+              title: eventTitle,
+              purpose: draftToHtml(
+                convertToRaw(eventPurpose.getCurrentContent())
+              ),
+              date: startDate.toString(),
+              minSubscribers: eventMinParticipant.toString(),
+              sender: currentUser.accountId,
+            },
+            BOATLOAD_OF_GAS
+          )
+          .catch((err) => {
+            console.log(err);
+            setLoader(false);
+          })
+          .then((data) => {
+            console.log(data);
+            setLoader(false);
+            history.push("/");
+          });
+      } catch (err) {
+        console.error(err);
+        setLoader(false);
+      }
+    } else {
+      store.addNotification({
+        title: "Error!",
+        message: "please fill up every fields before submitting",
+        type: "danger",
+        insert: "top",
+        container: "top-right",
+        animationIn: ["animated", "fadeIn"],
+        animationOut: ["animated", "fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      });
     }
   };
 
@@ -90,6 +107,17 @@ const EventRegistration = () => {
         setEventLatLng(latLng);
       })
       .catch((error) => console.error("Error", error));
+  };
+
+  const isEmptyField = () => {
+    if (
+      !eventTitle &&
+      eventPurpose !== EditorState.createEmpty() &&
+      !eventAddress &&
+      !eventMinParticipant
+    )
+      return true;
+    return false;
   };
 
   return (

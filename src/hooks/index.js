@@ -56,6 +56,11 @@ export const AppProvider = (props) => {
             ...prevState,
             selectedDonation: action.selectedDonation,
           };
+        case "SET_SELECTED_DONATION_FOR_DONATE":
+          return {
+            ...prevState,
+            selectedDonationForDonate: action.selectedDonationForDonate,
+          };
         default:
       }
     },
@@ -73,6 +78,7 @@ export const AppProvider = (props) => {
       donationEvents: [],
       selectedEvent: null,
       selectedDonation: null,
+      selectedDonationForDonate: null,
     }
   );
 
@@ -112,6 +118,12 @@ export const AppProvider = (props) => {
         dispatch({
           type: "SET_DECRYPT_LOCATION_EVENT_UUID",
           decryptLocationEventUuid,
+        });
+      },
+      setSelectedDonationForDonate: (selectedDonationForDonate) => {
+        dispatch({
+          type: "SET_SELECTED_DONATION_FOR_DONATE",
+          selectedDonationForDonate,
         });
       },
     }),

@@ -6,13 +6,8 @@ import { useHistory } from "react-router-dom";
 import textVersion from "textversionjs";
 import "./DonationHome.scss";
 import Big from "big.js";
-import { isJoined, isQuotaFilled, isDonationNeeded } from "../../utils";
-import { NuCypherService } from "../../services";
+import { isDonationNeeded } from "../../utils";
 import Loader from "react-loader-spinner";
-
-const BOATLOAD_OF_GAS = Big(1)
-  .times(10 ** 16)
-  .toFixed();
 
 const DonationHome = () => {
   const history = useHistory();
@@ -25,7 +20,7 @@ const DonationHome = () => {
   } = useContext(StateContext);
   const {
     setModalConfig,
-    setDecryptLocationEventUuid,
+    setSelectedDonationForDonate,
     setDonationEvents,
   } = useContext(ActionContext);
 
@@ -57,11 +52,33 @@ const DonationHome = () => {
     }
   }, [contract]);
 
+  const donateHere = (donation) => {
+    setSelectedDonationForDonate(donation);
+    setModalConfig(true, { type: "donate" });
+    // setDonationLoader(donation.uuid);
+    // const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
+    // contract
+    //   .donateEvent(
+    //     {
+    //       donationUUID: randomID,
+    //       donationEventUUID: donation.uuid,
+    //       donorsAddress: "0x7437461F372bEc2B1106EB87Fac96B93afEf791d",
+    //       amount: "1",
+    //     },
+    //     BOATLOAD_OF_GAS
+    //   )
+    //   .then((data) => {
+    //     console.log(data);
+    //     setDonationLoader("");
+    //     reloadEvent();
+    //   });
+  };
+
   const openDonation = (donation) => {
     history.push(`/donations/${donation.uuid}`);
   };
   return (
-    <main className="home">
+    <main className="donation-home">
       <div className="home-container">
         <div>
           <h2>Discover Donations</h2>

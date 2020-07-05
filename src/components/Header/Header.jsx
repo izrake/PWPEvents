@@ -22,19 +22,19 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-bar">
-        <div className="header-app-icon">zkChange.</div>
+        <div className="header-app-icon">PWPEvents.</div>
         <div className="header-action-button-container">
           <div className="header-tabs">
             <Link to="/">Home</Link>
           </div>
           <div className="header-tabs">
-            <Link to="/">Browse</Link>
+            <Link to="/events">Explore Events</Link>
+          </div>
+          <div className="header-tabs">
+            <Link to="/donations">Explore Donations</Link>
           </div>
           <div className="header-tabs">
             <Link to="/event-registration">Start an Event</Link>
-          </div>
-          <div className="header-tabs">
-            <Link to="/donations">Donations</Link>
           </div>
           <div className="header-tabs">
             {!currentUser ? (
