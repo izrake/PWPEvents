@@ -1,0 +1,58 @@
+.user-encryption-creds {
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+  width: 600px;
+  justify-items: center;
+
+  .user-encryption-creds-success-container {
+    text-align: center;
+    margin-top: 1em;
+    .user-encryption-creds-success {
+      width: 168px;
+      height: 168px;
+    }
+  }
+
+  .user-encryption-creds-title {
+    color: var(--themeColor);
+    text-align: center;
+  }
+
+  .align-center {
+    text-align: center;
+  }
+
+  .user-encryption-creds-desc {
+    font-size: 14px;
+  }
+
+  .download-file-buttons {
+    border: 2px solid var(--themeColor);
+    margin-left: 2em;
+    font-weight: 700;
+    padding: 8px 42px;
+    background-color: #ff8a001f;
+    color: var(--themeColor);
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    z-index: 100;
+    transition: background-color 250ms ease-in-out;
+    box-shadow: 0px 4px 6px 0px #9b4dca3b;
+    outline: none;
+    width: 200px;
+    align-items: center;
+    display: flex;
+    margin: 1em auto;
+    svg {
+      margin-right: 12px;
+    }
+    &:hover {
+      background-color: var(--themeColor);
+      color: var(--whiteColor);
+    }
+  }
+
+}

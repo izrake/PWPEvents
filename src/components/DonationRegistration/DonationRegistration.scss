@@ -1,0 +1,168 @@
+.event-registration {
+  background: linear-gradient(180deg, #f6f6f6, #fff);
+  .event-registration-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 700px;
+    margin: 0px auto;
+    padding: 3em 0em;
+
+    .event-registration-form {
+      .event-registration-progress-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        .event-registration-progress-number {
+          border-radius: 50%;
+          border: 2px solid #adacad;
+          font-size: 18px;
+          color: #adacad;
+          height: 40px;
+          width: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+
+        .event-registration-progress-done {
+          border-radius: 50%;
+          border: 2px solid var(--active);
+          font-size: 18px;
+          color: var(--active);
+          height: 40px;
+          width: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+
+        .active {
+          background: var(--themeColor) !important;
+          border-color: var(--themeColor) !important;
+          color: var(--whiteColor) !important;
+        }
+      }
+
+      .event-registration-form-item {
+        margin-top: 3em;
+
+        .form-control-input {
+          width: 97%;
+          line-height: normal;
+          padding: 10px;
+          border: solid 1px #dbd9db;
+          border-radius: 5px;
+          color: #363135;
+          -webkit-appearance: none;
+          display: block;
+          font-size: 1.25rem;
+          margin-top: 2em;
+        }
+
+        .autocomplete-dropdown-container {
+          border: solid 1px #dbd9db;
+        }
+        .rdw-editor-toolbar {
+          margin-bottom: 0px !important;
+          border-bottom-left-radius: 0px !important;
+          border-bottom-right-radius: 0px !important;
+          border-top-left-radius: 5px !important;
+          border-top-right-radius: 5px !important;
+          border: solid 1px #dbd9db !important;
+        }
+        .event-purpose-editor {
+          width: 100%;
+          line-height: normal;
+          padding: 10px;
+          border: solid 1px #dbd9db;
+          border-bottom-left-radius: 5px;
+          border-bottom-right-radius: 5px;
+          border-top: 0px;
+          color: #363135;
+          -webkit-appearance: none;
+          display: block;
+          min-height: 250px;
+          background: #fff;
+        }
+
+        .event-form-date-picker {
+          margin-top: 2em;
+          .react-datepicker-wrapper {
+            width: 100%;
+            input {
+              width: 97%;
+              line-height: normal;
+              padding: 10px;
+              border: solid 1px #dbd9db;
+              border-radius: 5px;
+              color: #363135;
+              -webkit-appearance: none;
+              display: block;
+              font-size: 1.25rem;
+            }
+          }
+          .react-datepicker__triangle {
+            left: 48px !important;
+          }
+        }
+
+        .location-search-input {
+          width: 97%;
+          line-height: normal;
+          padding: 10px;
+          border: solid 1px #dbd9db;
+          border-radius: 5px;
+          color: #363135;
+          -webkit-appearance: none;
+          display: block;
+          font-size: 1.25rem;
+          margin-top: 2em;
+        }
+
+        .event-registration-next-button-container {
+          margin-top: 2em;
+          display: flex;
+          justify-content: flex-end;
+          .event-registration-next-button {
+            -webkit-font-smoothing: antialiased;
+            text-decoration: none;
+            display: flex;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1;
+            border-radius: 5px;
+            border: 2px solid #adacad;
+            background-color: transparent;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            -webkit-appearance: initial !important;
+            -webkit-transition: background 0.1s ease, border 0.1s ease;
+            transition: background 0.1s ease, border 0.1s ease;
+            cursor: pointer;
+            background: var(--themeColor);
+            color: #fff;
+            border-color: var(--themeColor);
+            font-size: 1rem;
+            padding: 8px 18px;
+            align-items: center;
+            outline: none;
+
+            &:active {
+              color: var(--themeColor);
+              border-color: var(--themeColor);
+              background: #fff;
+            }
+
+            &:hover {
+              color: #fff;
+              background: var(--themeColorDark);
+              border-color: var(--themeColorDark);
+            }
+          }
+        }
+      }
+    }
+  }
+}
