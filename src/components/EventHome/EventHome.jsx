@@ -9,10 +9,17 @@ import Big from "big.js";
 import { isJoined, isQuotaFilled } from "../../utils";
 import { NuCypherService } from "../../services";
 import Loader from "react-loader-spinner";
+import GeoCode from "react-geocode";
 
 const BOATLOAD_OF_GAS = Big(1)
   .times(10 ** 16)
   .toFixed();
+
+// set Google Maps Geocoding API for purposes of quota management. Its optional but recommended.
+GeoCode.setApiKey("AIzaSyAotB8hkeaYU0roIQfylNmPhkJ2oLu2ajI");
+
+// set response language. Defaults to english.
+GeoCode.setLanguage("en");
 
 const EventHome = () => {
   const history = useHistory();
@@ -27,12 +34,38 @@ const EventHome = () => {
 
   useEffect(() => {
     // TODO: don't just fetch once; subscribe!
-    if (contract) {
-      contract.getEvents().then((events) => {
-        console.log(events);
-        setEvents(events);
-      });
-    }
+    let watchLocation = navigator.geolocation.getCurrentPosition((position) => {
+      console.log(position);
+      GeoCode.fromLatLng(
+        position.coords.latitude,
+        position.coords.longitude
+      ).then(
+        (response) => {
+          const address = response.results[0].address_components.filter(
+            (address) => address.types[0] === "locality"
+          )[0].long_name;
+          console.log(address);
+          if (contract) {
+            contract
+              .getEventsByLocality({ locality: address })
+              .then((eventUUIDs) => {
+                Promise.all(
+                  eventUUIDs.map((eventUUID) =>
+                    contract.getEventByUUID({ uuid: eventUUID })
+                  )
+                ).then((events) => setEvents(events));
+              });
+          }
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    });
+
+    return () => {
+      navigator.geolocation.clearWatch(watchLocation);
+    };
   }, [contract]);
 
   const joinEvent = async (event) => {

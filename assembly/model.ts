@@ -93,22 +93,26 @@ export const donationEventMap = new PersistentMap<
 
 export const donationMap = new PersistentMap<string, Donation>("d");
 
-export const users = new PersistentVector<User>("g");
+export const users = new PersistentVector<User>("e");
 
-export const events = new PersistentVector<EventRegistration>("h");
+export const events = new PersistentVector<EventRegistration>("f");
+
+export const localities = new PersistentVector<string>("g");
 
 export const donationEvents = new PersistentVector<DonationEventRegistration>(
-  "i"
+  "h"
 );
 
-export const donations = new PersistentVector<Donation>("j");
+export const donations = new PersistentVector<Donation>("i");
+
+export const localityToEventMap = new PersistentMap<string, string[]>("j");
 
 export const mainEventToDonationEventMap = new PersistentMap<string, string[]>(
-  "e"
+  "k"
 );
 
 export const donationToDonationEventMap = new PersistentMap<string, string[]>(
-  "f"
+  "l"
 );
 
-export const subscribers = new PersistentMap<string, string[]>("k");
+export const subscribers = new PersistentMap<string, string[]>("m");

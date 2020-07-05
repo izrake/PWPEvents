@@ -6,8 +6,9 @@ import { useHistory } from "react-router-dom";
 import textVersion from "textversionjs";
 import "./DonationHome.scss";
 import Big from "big.js";
-import { isDonationNeeded } from "../../utils";
+import { isDonationNeeded, convertTwoDigits } from "../../utils";
 import Loader from "react-loader-spinner";
+import Countdown from "react-countdown";
 
 const DonationHome = () => {
   const history = useHistory();
@@ -136,7 +137,21 @@ const DonationHome = () => {
                   <span className="donation-list-item-date-icon">
                     <Calendar />
                   </span>
-                  <span>Valid till {donationEvent.validDate}</span>
+                  {/* <span>Valid till {donationEvent.validDate}</span> */}
+                  <span>
+                    <Countdown
+                      date={new Date(donationEvent.validDate)}
+                      intervalDelay={0}
+                      precision={0}
+                      renderer={(props) => (
+                        <div>
+                          {props.days} Days {convertTwoDigits(props.hours)}:
+                          {convertTwoDigits(props.minutes)}:
+                          {convertTwoDigits(props.seconds)} Time Left
+                        </div>
+                      )}
+                    />
+                  </span>
                 </div>
                 <div className="top-margin-set donation-list-item-date">
                   <span className="donation-list-item-date-icon">

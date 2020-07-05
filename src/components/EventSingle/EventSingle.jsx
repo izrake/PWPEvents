@@ -6,9 +6,15 @@ import "./EventSingle.scss";
 import { Calendar, MapPin, Users } from "react-feather";
 import Big from "big.js";
 import textVersion from "textversionjs";
-import { isJoined, isQuotaFilled, isDonationNeeded } from "../../utils";
+import {
+  isJoined,
+  isQuotaFilled,
+  isDonationNeeded,
+  convertTwoDigits,
+} from "../../utils";
 import { NuCypherService } from "../../services";
 import Loader from "react-loader-spinner";
+import Countdown from "react-countdown";
 
 const BOATLOAD_OF_GAS = Big(1)
   .times(10 ** 16)
@@ -161,7 +167,7 @@ const EventSingle = () => {
       {selectedEvent && (
         <div className="event-single-container">
           <h1 className="event-single-title">{selectedEvent.title}</h1>
-          {selectedEvent.owner === currentUser.accountId && (
+          {currentUser && selectedEvent.owner === currentUser.accountId && (
             <div className="top-margin-set event-single-owner-container">
               <p className="event-owner-content">
                 You are the{" "}
@@ -334,7 +340,22 @@ const EventSingle = () => {
                         <span className="donation-list-item-date-icon">
                           <Calendar />
                         </span>
-                        <span>Valid till {donationEvent.validDate}</span>
+                        {/* <span>Valid till {donationEvent.validDate}</span> */}
+                        <span>
+                          <Countdown
+                            date={new Date(donationEvent.validDate)}
+                            intervalDelay={0}
+                            precision={0}
+                            renderer={(props) => (
+                              <div>
+                                {props.days} Days{" "}
+                                {convertTwoDigits(props.hours)}:
+                                {convertTwoDigits(props.minutes)}:
+                                {convertTwoDigits(props.seconds)} Time Left
+                              </div>
+                            )}
+                          />
+                        </span>
                       </div>
                       <div className="top-margin-set donation-list-item-date">
                         <span className="donation-list-item-date-icon">
@@ -350,7 +371,8 @@ const EventSingle = () => {
                         className="donation-list-item-join-button"
                         disabled={
                           !isDonationNeeded(donationEvent) ||
-                          donationEvent.owner === currentUser.accountId
+                          (currentUser &&
+                            donationEvent.owner === currentUser.accountId)
                         }
                         onClick={(e) => donateHere(donationEvent)}
                       >

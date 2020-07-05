@@ -1,1 +1,8 @@
 node_modules
+/apiflask/*.json
+/apiflask/*.msgpack
+/apiflask/flaskr.egg-info
+/apiflask/.idea
+/dist
+/out
+.cache

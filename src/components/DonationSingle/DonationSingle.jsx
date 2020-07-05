@@ -4,13 +4,7 @@ import { StateContext, ActionContext } from "../../hooks";
 import { useParams, useHistory } from "react-router-dom";
 import "./DonationSingle.scss";
 import { Calendar, Users } from "react-feather";
-import Big from "big.js";
-import {
-  isJoined,
-  isQuotaFilled,
-  isDonationNeeded,
-  convertTwoDigits,
-} from "../../utils";
+import { isDonationNeeded, convertTwoDigits } from "../../utils";
 import Loader from "react-loader-spinner";
 import Countdown from "react-countdown";
 
@@ -96,7 +90,7 @@ const DonationSingle = () => {
       {selectedDonation && (
         <div className="event-single-container">
           <h1 className="event-single-title">{selectedDonation.title}</h1>
-          {selectedDonation.owner === currentUser.accountId && (
+          {currentUser && selectedDonation.owner === currentUser.accountId && (
             <div className="top-margin-set event-single-owner-container">
               <p className="event-owner-content">
                 You are the{" "}
@@ -118,25 +112,29 @@ const DonationSingle = () => {
               className="event-single-progress"
               style={{
                 width:
-                  (Number.parseFloat(
-                    selectedDonation.donations
-                      .map((donation) => Number.parseFloat(donation.amount))
-                      .reduce((prev, curr) => prev + curr)
-                  ) /
-                    Number.parseFloat(selectedDonation.minAmount)) *
-                    100 +
-                  "%",
+                  selectedDonation.donations.length === 0
+                    ? "0%"
+                    : (Number.parseFloat(
+                        selectedDonation.donations
+                          .map((donation) => Number.parseFloat(donation.amount))
+                          .reduce((prev, curr) => prev + curr)
+                      ) /
+                        Number.parseFloat(selectedDonation.minAmount)) *
+                        100 +
+                      "%",
               }}
             ></div>
           </div>
           <div className="event-single-progress-labels-container">
             <span className="event-single-progress-label">
               $
-              {Number.parseFloat(
-                selectedDonation.donations
-                  .map((donation) => Number.parseFloat(donation.amount))
-                  .reduce((prev, curr) => prev + curr)
-              )}{" "}
+              {selectedDonation.donations.length === 0
+                ? 0
+                : Number.parseFloat(
+                    selectedDonation.donations
+                      .map((donation) => Number.parseFloat(donation.amount))
+                      .reduce((prev, curr) => prev + curr)
+                  )}{" "}
               donated
             </span>
             <span className="event-single-progress-label">
@@ -159,7 +157,7 @@ const DonationSingle = () => {
                       <div>
                         {props.days} Days {convertTwoDigits(props.hours)}:
                         {convertTwoDigits(props.minutes)}:
-                        {convertTwoDigits(props.seconds)} Left
+                        {convertTwoDigits(props.seconds)} Time Left
                       </div>
                     )}
                   />
@@ -177,7 +175,8 @@ const DonationSingle = () => {
                 className="event-single-join-button"
                 disabled={
                   !isDonationNeeded(selectedDonation) ||
-                  selectedDonation.owner === currentUser.accountId
+                  (currentUser &&
+                    selectedDonation.owner === currentUser.accountId)
                 }
                 onClick={(e) => donateHere(selectedDonation)}
               >

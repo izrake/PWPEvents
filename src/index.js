@@ -41,6 +41,7 @@ async function initContract() {
         "getUsers",
         "getUserBySender",
         "getEvents",
+        "getEventsByLocality",
         "getEventByUUID",
         "getDonationEvents",
         "getDonationEventByUUID",

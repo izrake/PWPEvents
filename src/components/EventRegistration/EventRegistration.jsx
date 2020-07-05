@@ -31,6 +31,7 @@ const EventRegistration = () => {
   const [eventPurpose, setEventPurpose] = useState(EditorState.createEmpty());
   const [startDate, setStartDate] = useState(new Date());
   const [eventAddress, setEventAddress] = useState("");
+  const [eventLocality, setEventLocality] = useState("");
   const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
   const [eventMinParticipant, setEventMinParticipant] = useState("");
   const [eventRegistrationProgress, setEventRegistrationProgress] = useState(1);
@@ -46,37 +47,92 @@ const EventRegistration = () => {
           latitude: eventLatLng.lat.toString(),
           longitude: eventLatLng.lng.toString(),
         });
-        await NuCypherService.encryptData(
-          enc_data,
-          currentUser.accountId,
-          randomID
-        );
-        contract
-          .addEvent(
-            {
-              uuid: randomID,
-              title: eventTitle,
-              purpose: draftToHtml(
-                convertToRaw(eventPurpose.getCurrentContent())
-              ),
-              date: startDate.toString(),
-              minSubscribers: eventMinParticipant.toString(),
-              sender: currentUser.accountId,
-            },
-            BOATLOAD_OF_GAS
-          )
-          .catch((err) => {
-            console.log(err);
-            setLoader(false);
-          })
+        NuCypherService.encryptData(enc_data, currentUser.accountId, randomID)
           .then((data) => {
-            console.log(data);
+            contract
+              .addEvent(
+                {
+                  uuid: randomID,
+                  title: eventTitle,
+                  purpose: draftToHtml(
+                    convertToRaw(eventPurpose.getCurrentContent())
+                  ),
+                  date: startDate.toString(),
+                  minSubscribers: eventMinParticipant.toString(),
+                  sender: currentUser.accountId,
+                  locality: eventLocality,
+                },
+                BOATLOAD_OF_GAS
+              )
+              .catch((err) => {
+                console.log(err);
+                setLoader(false);
+                store.addNotification({
+                  title: "Error!",
+                  message: err.message,
+                  type: "danger",
+                  insert: "top",
+                  container: "top-right",
+                  animationIn: ["animated", "fadeIn"],
+                  animationOut: ["animated", "fadeOut"],
+                  dismiss: {
+                    duration: 5000,
+                    onScreen: true,
+                  },
+                });
+              })
+              .then((data) => {
+                console.log(data);
+                setLoader(false);
+                store.addNotification({
+                  title: "Awesome!",
+                  message: "You have successfully created an event!",
+                  type: "success",
+                  insert: "top",
+                  container: "top-right",
+                  animationIn: ["animated", "fadeIn"],
+                  animationOut: ["animated", "fadeOut"],
+                  dismiss: {
+                    duration: 5000,
+                    onScreen: true,
+                  },
+                });
+                history.push("/");
+              });
+          })
+          .catch((err) => {
+            console.error(err);
             setLoader(false);
-            history.push("/");
+            store.addNotification({
+              title: "Error!",
+              message: err.message,
+              type: "danger",
+              insert: "top",
+              container: "top-right",
+              animationIn: ["animated", "fadeIn"],
+              animationOut: ["animated", "fadeOut"],
+              dismiss: {
+                duration: 5000,
+                onScreen: true,
+              },
+            });
           });
       } catch (err) {
         console.error(err);
         setLoader(false);
+        store.addNotification({
+          title: "Error!",
+          message: err.message,
+          type: "danger",
+          insert: "top",
+          container: "top-right",
+          animationIn: ["animated", "fadeIn"],
+          animationOut: ["animated", "fadeOut"],
+          dismiss: {
+            duration: 5000,
+            onScreen: true,
+          },
+        });
       }
     } else {
       store.addNotification({
@@ -102,7 +158,14 @@ const EventRegistration = () => {
   const handleSelect = (address) => {
     setEventAddress(address);
     geocodeByAddress(address)
-      .then((results) => getLatLng(results[0]))
+      .then((results) => {
+        const locality = results[0].address_components.filter(
+          (address) => address.types[0] === "locality"
+        )[0].long_name;
+        console.log(locality);
+        setEventLocality(locality);
+        return getLatLng(results[0]);
+      })
       .then((latLng) => {
         setEventLatLng(latLng);
       })
@@ -110,11 +173,16 @@ const EventRegistration = () => {
   };
 
   const isEmptyField = () => {
+    const blocks = convertToRaw(eventPurpose.getCurrentContent()).blocks;
+    const eventPurposeValue = blocks
+      .map((block) => (!block.text.trim() && "\n") || block.text)
+      .join("\n")
+      .trim();
     if (
-      !eventTitle &&
-      eventPurpose !== EditorState.createEmpty() &&
-      !eventAddress &&
-      !eventMinParticipant
+      !!eventTitle &&
+      !!eventPurposeValue &&
+      !!eventAddress &&
+      !!eventMinParticipant
     )
       return true;
     return false;

@@ -16,6 +16,8 @@ import {
   Donation,
   donationMap,
   donations,
+  localities,
+  localityToEventMap,
 } from "./model";
 import { storage, context, logging } from "near-sdk-as";
 
@@ -57,43 +59,33 @@ export function addEvent(
   purpose: string,
   date: string,
   minSubscribers: string,
-  sender: string
+  sender: string,
+  locality: string
 ): boolean {
-  let getEvent = eventsMap.get(uuid);
-  if (getEvent !== null) {
-    // updaye subscrieber for specific uuid
-    let val = subscribers.get(uuid);
-    if (val !== null) {
-      val.push(sender);
-      subscribers.set(uuid, val);
-      getEvent.subscriber = val;
-      eventsMap.set(uuid, getEvent);
-    } else {
-      let arr = new Array<string>();
-      arr.push(sender);
-      subscribers.set(uuid, arr);
-      getEvent.subscriber = arr;
-      eventsMap.set(uuid, getEvent);
-    }
-    return true;
+  let sub = new Array<string>();
+  let donationEvents = new Array<string>();
+  sub.push(context.sender);
+  let eventRegistration = new EventRegistration(
+    uuid,
+    title,
+    purpose,
+    date,
+    minSubscribers,
+    sub,
+    donationEvents,
+    sender
+  );
+  eventsMap.set(uuid, eventRegistration);
+  events.push(eventRegistration);
+  localities.push(locality);
+  let eventsInLocalities = localityToEventMap.get(locality);
+  if (eventsInLocalities != null && eventsInLocalities.length) {
+    eventsInLocalities.push(uuid);
+    localityToEventMap.set(locality, eventsInLocalities);
   } else {
-    let sub = new Array<string>();
-    let donationEvents = new Array<string>();
-    sub.push(context.sender);
-    let eventRegistration = new EventRegistration(
-      uuid,
-      title,
-      purpose,
-      date,
-      minSubscribers,
-      sub,
-      donationEvents,
-      sender
-    );
-    eventsMap.set(uuid, eventRegistration);
-    events.push(eventRegistration);
-    return true;
+    localityToEventMap.set(locality, [uuid]);
   }
+  return true;
 }
 
 export function addDonationEvent(
@@ -169,6 +161,21 @@ export function getEvents(): EventRegistration[] {
     }
   }
   return result;
+}
+
+export function getEventsByLocality(locality: string): string[] {
+  let eventsInLocalities = localityToEventMap.get(locality);
+  if (eventsInLocalities != null && eventsInLocalities.length) {
+    const numMessages = min(MESSAGE_LIMIT, eventsInLocalities.length);
+    const startIndex = eventsInLocalities.length - numMessages;
+    const result = new Array<string>(numMessages);
+    for (let i = 0; i < numMessages; i++) {
+      result[i] = eventsInLocalities[i + startIndex];
+    }
+    return result;
+  } else {
+    return [];
+  }
 }
 
 export function getEventByUUID(uuid: string): EventRegistration {

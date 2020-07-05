@@ -12,6 +12,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useHistory, useParams } from "react-router-dom";
 import Big from "big.js";
 import Loader from "react-loader-spinner";
+import { store } from "react-notifications-component";
 
 const BOATLOAD_OF_GAS = Big(1)
   .times(10 ** 16)
@@ -36,36 +37,110 @@ const DonationRegistration = () => {
   const [loader, setLoader] = useState(false);
 
   const submitDonation = async () => {
-    if (id) {
-      setLoader(true);
-      try {
-        const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
-        contract
-          .addDonationEvent(
-            {
-              donationEventUUID: randomID,
-              mainEventUUID: id,
-              title: donationTitle,
-              purpose: draftToHtml(
-                convertToRaw(donationPurpose.getCurrentContent())
-              ),
-              date: new Date().toString(),
-              validDate: validDate.toString(),
-              minAmount: donationMinAmount.toString(),
-              receiverAddress: donationRecipientAddress,
-              sender: currentUser.accountId,
+    if (isNotEmptyField()) {
+      if (id) {
+        setLoader(true);
+        try {
+          const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
+          contract
+            .addDonationEvent(
+              {
+                donationEventUUID: randomID,
+                mainEventUUID: id,
+                title: donationTitle,
+                purpose: draftToHtml(
+                  convertToRaw(donationPurpose.getCurrentContent())
+                ),
+                date: new Date().toString(),
+                validDate: validDate.toString(),
+                minAmount: donationMinAmount.toString(),
+                receiverAddress: donationRecipientAddress,
+                sender: currentUser.accountId,
+              },
+              BOATLOAD_OF_GAS
+            )
+            .catch((err) => {
+              console.log(err);
+              store.addNotification({
+                title: "Error!",
+                message: err.message,
+                type: "danger",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animated", "fadeIn"],
+                animationOut: ["animated", "fadeOut"],
+                dismiss: {
+                  duration: 5000,
+                  onScreen: true,
+                },
+              });
+            })
+            .then((data) => {
+              console.log(data);
+              history.push(`/events/${id}`);
+              setLoader(false);
+              store.addNotification({
+                title: "Awesome!",
+                message: "You have successfully created a donation!",
+                type: "success",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animated", "fadeIn"],
+                animationOut: ["animated", "fadeOut"],
+                dismiss: {
+                  duration: 5000,
+                  onScreen: true,
+                },
+              });
+            });
+        } catch (err) {
+          console.error(err);
+          store.addNotification({
+            title: "Error!",
+            message: err.message,
+            type: "danger",
+            insert: "top",
+            container: "top-right",
+            animationIn: ["animated", "fadeIn"],
+            animationOut: ["animated", "fadeOut"],
+            dismiss: {
+              duration: 5000,
+              onScreen: true,
             },
-            BOATLOAD_OF_GAS
-          )
-          .then((data) => {
-            console.log(data);
-            history.push(`/events/${id}`);
-            setLoader(false);
           });
-      } catch (err) {
-        console.error(err);
+        }
       }
+    } else {
+      store.addNotification({
+        title: "Error!",
+        message: "please fill up every fields before submitting",
+        type: "danger",
+        insert: "top",
+        container: "top-right",
+        animationIn: ["animated", "fadeIn"],
+        animationOut: ["animated", "fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      });
     }
+  };
+
+  const isNotEmptyField = () => {
+    const blocks = convertToRaw(donationPurpose.getCurrentContent()).blocks;
+    const donationPurposeValue = blocks
+      .map((block) => (!block.text.trim() && "\n") || block.text)
+      .join("\n")
+      .trim();
+    if (
+      !!donationTitle &&
+      !!donationPurposeValue &&
+      !!donationMinAmount &&
+      !!donationRecipientAddress
+    )
+      return true;
+    return false;
   };
 
   return (
