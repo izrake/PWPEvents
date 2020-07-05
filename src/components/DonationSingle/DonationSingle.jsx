@@ -5,12 +5,14 @@ import { useParams, useHistory } from "react-router-dom";
 import "./DonationSingle.scss";
 import { Calendar, Users } from "react-feather";
 import Big from "big.js";
-import { isJoined, isQuotaFilled, isDonationNeeded } from "../../utils";
+import {
+  isJoined,
+  isQuotaFilled,
+  isDonationNeeded,
+  convertTwoDigits,
+} from "../../utils";
 import Loader from "react-loader-spinner";
-
-const BOATLOAD_OF_GAS = Big(1)
-  .times(10 ** 16)
-  .toFixed();
+import Countdown from "react-countdown";
 
 const DonationSingle = () => {
   let { id } = useParams();
@@ -19,7 +21,11 @@ const DonationSingle = () => {
   const { contract, currentUser, userDetails, selectedDonation } = useContext(
     StateContext
   );
-  const { setSelectedDonation, setModalConfig } = useContext(ActionContext);
+  const {
+    setSelectedDonation,
+    setModalConfig,
+    setSelectedDonationForDonate,
+  } = useContext(ActionContext);
 
   const [readMore, setReadMore] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -46,42 +52,45 @@ const DonationSingle = () => {
   }, [contract, id]);
 
   const donateHere = (donation) => {
-    setLoader(true);
-    const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
-    contract
-      .donateEvent(
-        {
-          donationUUID: randomID,
-          donationEventUUID: donation.uuid,
-          donorsAddress: "0x7437461F372bEc2B1106EB87Fac96B93afEf791d",
-          amount: "1",
-        },
-        BOATLOAD_OF_GAS
-      )
-      .then((data) => {
-        contract
-          .getDonationEventByUUID({ donationEventUUID: id })
-          .then((donationEvent) => {
-            Promise.all(
-              donationEvent.donations.map((donation) =>
-                contract.getDonationByUUID({
-                  donationUUID: donation,
-                })
-              )
-            ).then((donations) => {
-              console.log(donations);
-              donationEvent.donations = donations;
-              console.log(donationEvent);
-              setSelectedDonation(donationEvent);
-              setLoader(false);
-            });
-          });
-      });
+    setSelectedDonationForDonate(donation);
+    setModalConfig(true, { type: "donate" });
+    // setLoader(true);
+    // const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
+    // contract
+    //   .donateEvent(
+    //     {
+    //       donationUUID: randomID,
+    //       donationEventUUID: donation.uuid,
+    //       donorsAddress: "0x7437461F372bEc2B1106EB87Fac96B93afEf791d",
+    //       amount: "1",
+    //     },
+    //     BOATLOAD_OF_GAS
+    //   )
+    //   .then((data) => {
+    //     contract
+    //       .getDonationEventByUUID({ donationEventUUID: id })
+    //       .then((donationEvent) => {
+    //         Promise.all(
+    //           donationEvent.donations.map((donation) =>
+    //             contract.getDonationByUUID({
+    //               donationUUID: donation,
+    //             })
+    //           )
+    //         ).then((donations) => {
+    //           console.log(donations);
+    //           donationEvent.donations = donations;
+    //           console.log(donationEvent);
+    //           setSelectedDonation(donationEvent);
+    //           setLoader(false);
+    //         });
+    //       });
+    //   });
   };
 
   const createDonation = () => {
     history.push(`/events/${selectedDonation.mainEventUUID}/create-donation`);
   };
+
   return (
     <main className="event-single">
       {selectedDonation && (
@@ -140,7 +149,21 @@ const DonationSingle = () => {
                 <span className="event-single-date-icon">
                   <Calendar />
                 </span>
-                <span>Valid till {selectedDonation.validDate}</span>
+                {/* <span>Valid till {selectedDonation.validDate}</span> */}
+                <span>
+                  <Countdown
+                    date={new Date(selectedDonation.validDate)}
+                    intervalDelay={0}
+                    precision={0}
+                    renderer={(props) => (
+                      <div>
+                        {props.days} Days {convertTwoDigits(props.hours)}:
+                        {convertTwoDigits(props.minutes)}:
+                        {convertTwoDigits(props.seconds)} Left
+                      </div>
+                    )}
+                  />
+                </span>
               </div>
               <div className="top-margin-set event-single-date">
                 <span className="event-single-date-icon">
@@ -154,7 +177,7 @@ const DonationSingle = () => {
                 className="event-single-join-button"
                 disabled={
                   !isDonationNeeded(selectedDonation) ||
-                  donationEvent.owner === currentUser.accountId
+                  selectedDonation.owner === currentUser.accountId
                 }
                 onClick={(e) => donateHere(selectedDonation)}
               >

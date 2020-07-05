@@ -23,3 +23,8 @@ export const isDonationNeeded = (donationEvent) => {
         );
   return Number.parseFloat(donationEvent.minAmount) !== donationAmtDone;
 };
+
+export const convertTwoDigits = (pValue) => {
+  if (pValue < 10) return `0${pValue}`;
+  return pValue;
+};

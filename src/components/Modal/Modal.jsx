@@ -5,6 +5,7 @@ import { ActionContext, StateContext } from "../../hooks";
 import UserRegistration from "../UserRegistration";
 import UserEncryptionCreds from "../UserEncryptionCreds";
 import UploadEncryptionCreds from "../UploadEncryptionCreds";
+import DonateWidget from "../DonateWidget";
 
 function Modal() {
   const { setModalConfig } = useContext(ActionContext);
@@ -39,6 +40,7 @@ function Modal() {
           {modalConfig.type === "upload-encryption" && (
             <UploadEncryptionCreds></UploadEncryptionCreds>
           )}
+          {modalConfig.type === "donate" && <DonateWidget></DonateWidget>}
         </div>
       </div>
     </div>

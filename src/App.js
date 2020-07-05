@@ -13,6 +13,9 @@ import DonationRegistration from "./components/DonationRegistration";
 import DonationSingle from "./components/DonationSingle";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import DonationHome from "./components/DonationHome";
+import EventHome from "./components/EventHome";
+import ReactNotification from "react-notifications-component";
+import "react-notifications-component/dist/theme.css";
 
 const App = ({ contract, currentUser, nearConfig, wallet }) => {
   const { loadNearConfig, setModalConfig, setUserDetails } = React.useContext(
@@ -39,9 +42,11 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
   return (
     <div className="App">
       <Router>
+        <ReactNotification />
         <Header />
         <Modal />
         <Route path="/" exact render={() => <Home />} />
+        <Route path="/events" exact render={() => <EventHome />} />
         <Route path="/donations" exact render={() => <DonationHome />} />
         <Route path="/events/:id" exact render={() => <EventSingle />} />
         <Route path="/donations/:id" exact render={() => <DonationSingle />} />
