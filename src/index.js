@@ -47,6 +47,7 @@ async function initContract() {
         "getDonationEventByUUID",
         "getDonationByUUID",
         "getPolicy",
+        "getLocalities",
       ],
       // Change methods can modify the state, but you don't receive the returned value when called
       changeMethods: [

@@ -1,7 +1,7 @@
 import "regenerator-runtime/runtime";
 import React, { useState, useContext, useEffect } from "react";
 import { StateContext, ActionContext } from "../../hooks";
-import { Calendar, MapPin } from "react-feather";
+import { Calendar, MapPin, Search } from "react-feather";
 import { useHistory, Link } from "react-router-dom";
 import textVersion from "textversionjs";
 import "./EventHome.scss";
@@ -10,6 +10,7 @@ import { isJoined, isQuotaFilled } from "../../utils";
 import { NuCypherService } from "../../services";
 import Loader from "react-loader-spinner";
 import GeoCode from "react-geocode";
+import Select from "react-select";
 
 const BOATLOAD_OF_GAS = Big(1)
   .times(10 ** 16)
@@ -31,6 +32,10 @@ const EventHome = () => {
   );
 
   const [loader, setLoader] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [options, setOptions] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [searchEvents, setSearchEvents] = useState([]);
 
   useEffect(() => {
     // TODO: don't just fetch once; subscribe!
@@ -55,7 +60,10 @@ const EventHome = () => {
                     eventUUIDs.map((eventUUID) =>
                       contract.getEventByUUID({ uuid: eventUUID })
                     )
-                  ).then((events) => setEvents(events));
+                  ).then((events) => {
+                    setEvents(events);
+                    setSearchEvents(events);
+                  });
                 });
             }
           },
@@ -68,8 +76,21 @@ const EventHome = () => {
       if (contract) {
         contract.getEvents().then((events) => {
           setEvents(events);
+          setSearchEvents(events);
         });
       }
+    }
+
+    if (contract) {
+      contract.getLocalities().then((data) => {
+        console.log("Data", data);
+        const filteredLocality = data
+          .filter((loc, i) => data.indexOf(loc) === i)
+          .filter((loc) => loc !== "")
+          .map((loc) => ({ value: loc, label: loc }));
+        console.log(filteredLocality);
+        setOptions(filteredLocality);
+      });
     }
 
     return () => {
@@ -112,14 +133,60 @@ const EventHome = () => {
     history.push(`/events/${event.uuid}`);
   };
 
+  const handleChange = (selectedOption) => {
+    setSelectedOption(selectedOption);
+    if (contract) {
+      contract
+        .getEventsByLocality({ locality: selectedOption.value })
+        .then((eventUUIDs) => {
+          Promise.all(
+            eventUUIDs.map((eventUUID) =>
+              contract.getEventByUUID({ uuid: eventUUID })
+            )
+          ).then((events) => {
+            setEvents(events);
+            setSearchEvents(events);
+          });
+        });
+    }
+  };
+
+  const handleSearch = (search) => {
+    console.log(search);
+    setSearchText(search);
+    const searchList = events.filter(
+      (event) => event.title.toLowerCase().indexOf(search.toLowerCase()) !== -1
+    );
+    setSearchEvents(searchList);
+  };
+
   return (
     <main className="event-home">
       <div className="home-container">
         <div>
           <h2>Discover Near Events</h2>
         </div>
+        <div className="event-home-op-bar">
+          <div className="event-home-search-bar-container">
+            <Search />{" "}
+            <input
+              type="search"
+              className="event-home-search-bar"
+              placeholder="Search.."
+              value={searchText}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
+          <Select
+            value={selectedOption}
+            onChange={handleChange}
+            options={options}
+            placeholder="Search by location..."
+            className="event-home-select-location"
+          />
+        </div>
         <ul className="event-list-container">
-          {events.map((event, i) => (
+          {searchEvents.map((event, i) => (
             <li className="event-list-item" key={i}>
               <div onClick={(e) => openEvent(event)}>
                 <h3 className="event-list-item-title">{event.title}</h3>

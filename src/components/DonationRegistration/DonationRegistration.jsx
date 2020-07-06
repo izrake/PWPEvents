@@ -353,24 +353,16 @@ const DonationRegistration = () => {
             {donationRegistrationProgress === 5 && (
               <div className="event-registration-form-item">
                 <h1 className="event-form-title">
-                  What's your raiden account address?
+                  What's your wallet address?
                 </h1>
                 <p className="event-form-description">
-                  We have integrated raiden networks for fast privacy preserving
-                  payments, this will make your donation more secure and privacy
-                  preserving. For more details read this{" "}
-                  <a
-                    href="https://raiden.network/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    [Raiden Network]
-                  </a>
+                  We have to store your address for donor to send payment to you
+                  directly without us need to collect tokens{" "}
                 </p>
                 <input
                   type="text"
                   className="form-control-input"
-                  placeholder="Your Raiden account address"
+                  placeholder="Your wallet address"
                   value={donationRecipientAddress}
                   onChange={(e) => setDonationRecipientAddress(e.target.value)}
                 />

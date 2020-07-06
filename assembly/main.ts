@@ -243,6 +243,14 @@ export function getPolicy(key: string): Policy {
   return new Policy("", "", "");
 }
 
+export function getLocalities(): string[] {
+  const result = new Array<string>(localities.length);
+  for (let i = 0; i < localities.length; i++) {
+    result[i] = localities[i];
+  }
+  return result;
+}
+
 export function subscribeEvent(
   uuid: string,
   sender: string,
