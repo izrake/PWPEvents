@@ -149,18 +149,23 @@ const DonationSingle = () => {
                 </span>
                 {/* <span>Valid till {selectedDonation.validDate}</span> */}
                 <span>
-                  <Countdown
-                    date={new Date(selectedDonation.validDate)}
-                    intervalDelay={0}
-                    precision={0}
-                    renderer={(props) => (
-                      <div>
-                        {props.days} Days {convertTwoDigits(props.hours)}:
-                        {convertTwoDigits(props.minutes)}:
-                        {convertTwoDigits(props.seconds)} Time Left
-                      </div>
-                    )}
-                  />
+                  {new Date(selectedDonation.validDate).getTime() >
+                  new Date().getTime() ? (
+                    <Countdown
+                      date={new Date(selectedDonation.validDate)}
+                      intervalDelay={0}
+                      precision={0}
+                      renderer={(props) => (
+                        <div>
+                          {props.days} Days {convertTwoDigits(props.hours)}:
+                          {convertTwoDigits(props.minutes)}:
+                          {convertTwoDigits(props.seconds)} Time Left
+                        </div>
+                      )}
+                    />
+                  ) : (
+                    "Donation validity has been expired"
+                  )}
                 </span>
               </div>
               <div className="top-margin-set event-single-date">

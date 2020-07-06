@@ -34,34 +34,43 @@ const EventHome = () => {
 
   useEffect(() => {
     // TODO: don't just fetch once; subscribe!
-    let watchLocation = navigator.geolocation.getCurrentPosition((position) => {
-      console.log(position);
-      GeoCode.fromLatLng(
-        position.coords.latitude,
-        position.coords.longitude
-      ).then(
-        (response) => {
-          const address = response.results[0].address_components.filter(
-            (address) => address.types[0] === "locality"
-          )[0].long_name;
-          console.log(address);
-          if (contract) {
-            contract
-              .getEventsByLocality({ locality: address })
-              .then((eventUUIDs) => {
-                Promise.all(
-                  eventUUIDs.map((eventUUID) =>
-                    contract.getEventByUUID({ uuid: eventUUID })
-                  )
-                ).then((events) => setEvents(events));
-              });
+    let watchLocation = null;
+    if ("geolocation" in window) {
+      watchLocation = navigator.geolocation.getCurrentPosition((position) => {
+        console.log(position);
+        GeoCode.fromLatLng(
+          position.coords.latitude,
+          position.coords.longitude
+        ).then(
+          (response) => {
+            const address = response.results[0].address_components.filter(
+              (address) => address.types[0] === "locality"
+            )[0].long_name;
+            console.log(address);
+            if (contract) {
+              contract
+                .getEventsByLocality({ locality: address })
+                .then((eventUUIDs) => {
+                  Promise.all(
+                    eventUUIDs.map((eventUUID) =>
+                      contract.getEventByUUID({ uuid: eventUUID })
+                    )
+                  ).then((events) => setEvents(events));
+                });
+            }
+          },
+          (error) => {
+            console.error(error);
           }
-        },
-        (error) => {
-          console.error(error);
-        }
-      );
-    });
+        );
+      });
+    } else {
+      if (contract) {
+        contract.getEvents().then((events) => {
+          setEvents(events);
+        });
+      }
+    }
 
     return () => {
       navigator.geolocation.clearWatch(watchLocation);
@@ -77,12 +86,15 @@ const EventHome = () => {
       userDetails.publicEncKey,
       userDetails.publicSigKey
     )
-      .then(() => {
+      .then((data) => {
         contract
           .subscribeEvent(
             {
               uuid: event.uuid,
               sender: currentUser.accountId,
+              label: data.label,
+              policyPubKey: data.policy_pub_key,
+              policySigKey: data.policy_sig_key,
             },
             BOATLOAD_OF_GAS
           )
