@@ -87,7 +87,7 @@ const Header = () => {
                   Account Info
                 </Link>
               </div>
-              <div
+              {/* <div
                 className="toolbar-menu-box-item"
                 onClick={(e) => {
                   setDropdownActive(false);
@@ -106,7 +106,7 @@ const Header = () => {
                 <Link className="toolbar-menu-box-item-title" to="/account">
                   View your Donations
                 </Link>
-              </div>
+              </div> */}
               <div
                 className="toolbar-menu-box-item"
                 onClick={(e) => {

@@ -35,37 +35,49 @@ const Home = () => {
 
   useEffect(() => {
     // TODO: don't just fetch once; subscribe!
-    let watchLocation = navigator.geolocation.getCurrentPosition((position) => {
-      console.log(position);
-      GeoCode.fromLatLng(
-        position.coords.latitude,
-        position.coords.longitude
-      ).then(
-        (response) => {
-          const address = response.results[0].address_components.filter(
-            (address) => address.types[0] === "locality"
-          )[0].long_name;
-          console.log(address);
-          if (contract) {
-            contract
-              .getEventsByLocality({ locality: address })
-              .then((eventUUIDs) => {
-                Promise.all(
-                  eventUUIDs.map((eventUUID) =>
-                    contract.getEventByUUID({ uuid: eventUUID })
-                  )
-                ).then((events) => setEvents(events));
-              });
+    let watchLocation = null;
+    if ("geolocation" in window) {
+      watchLocation = navigator.geolocation.getCurrentPosition((position) => {
+        console.log(position);
+        GeoCode.fromLatLng(
+          position.coords.latitude,
+          position.coords.longitude
+        ).then(
+          (response) => {
+            console.log(response.results);
+            const address = response.results[0].address_components.filter(
+              (address) => address.types[0] === "locality"
+            )[0].long_name;
+            console.log(address);
+            if (contract) {
+              contract
+                .getEventsByLocality({ locality: address })
+                .then((eventUUIDs) => {
+                  Promise.all(
+                    eventUUIDs.map((eventUUID) =>
+                      contract.getEventByUUID({ uuid: eventUUID })
+                    )
+                  ).then((events) => setEvents(events));
+                });
+            }
+          },
+          (error) => {
+            console.error(error);
           }
-        },
-        (error) => {
-          console.error(error);
-        }
-      );
-    });
+        );
+      });
+    } else {
+      if (contract) {
+        contract.getEvents().then((events) => {
+          setEvents(events);
+        });
+      }
+    }
 
     return () => {
-      navigator.geolocation.clearWatch(watchLocation);
+      if (watchLocation) {
+        navigator.geolocation.clearWatch(watchLocation);
+      }
     };
   }, [contract]);
 
@@ -78,12 +90,15 @@ const Home = () => {
       userDetails.publicEncKey,
       userDetails.publicSigKey
     )
-      .then(() => {
+      .then((data) => {
         contract
           .subscribeEvent(
             {
               uuid: event.uuid,
               sender: currentUser.accountId,
+              label: data.label,
+              policyPubKey: data.policy_pub_key,
+              policySigKey: data.policy_sig_key,
             },
             BOATLOAD_OF_GAS
           )
@@ -131,91 +146,101 @@ const Home = () => {
           <h2>Discover Recent Events</h2>
         </div>
         <ul className="event-list-container">
-          {events.map((event, i) => (
-            <li className="event-list-item" key={i}>
-              <div onClick={(e) => openEvent(event)}>
-                <h3 className="event-list-item-title">{event.title}</h3>
-                <p className="event-list-item-description">
-                  {textVersion(event.purpose).substring(0, 128)}...{" "}
-                  <Link to={`/events/${event.uuid}`}>[Read More]</Link>
-                </p>
-                <div className="event-list-item-progress-container">
-                  <div
-                    className="event-list-item-progress"
-                    style={{
-                      width:
-                        ((event.subscriber.length / event.minSubscribers) *
-                          100 >
-                        100
-                          ? 100
-                          : (event.subscriber.length / event.minSubscribers) *
-                            100) + "%",
-                    }}
-                  ></div>
-                </div>
-                <div className="event-list-item-progress-labels-container">
-                  <span className="event-list-item-progress-label">
-                    {event.subscriber.length} joined
-                  </span>
-                  <span className="event-list-item-progress-label">
-                    {event.minSubscribers} member goal
-                  </span>
+          {events
+            .filter((evt, i) => i < 4)
+            .map((event, i) => (
+              <li className="event-list-item" key={i}>
+                <div onClick={(e) => openEvent(event)}>
+                  <h3 className="event-list-item-title">{event.title}</h3>
+                  <p className="event-list-item-description">
+                    {textVersion(event.purpose).substring(0, 128)}...{" "}
+                    <Link to={`/events/${event.uuid}`}>[Read More]</Link>
+                  </p>
+                  <div className="event-list-item-progress-container">
+                    <div
+                      className="event-list-item-progress"
+                      style={{
+                        width:
+                          ((event.subscriber.length / event.minSubscribers) *
+                            100 >
+                          100
+                            ? 100
+                            : (event.subscriber.length / event.minSubscribers) *
+                              100) + "%",
+                      }}
+                    ></div>
+                  </div>
+                  <div className="event-list-item-progress-labels-container">
+                    <span className="event-list-item-progress-label">
+                      {event.subscriber.length} joined
+                    </span>
+                    <span className="event-list-item-progress-label">
+                      {event.minSubscribers} member goal
+                    </span>
+                  </div>
+                  <div className="top-margin-set event-list-item-date">
+                    <span className="event-list-item-date-icon">
+                      <Calendar />
+                    </span>
+                    <span>{event.date}</span>
+                  </div>
                 </div>
                 <div className="top-margin-set event-list-item-date">
                   <span className="event-list-item-date-icon">
-                    <Calendar />
+                    <MapPin />
                   </span>
-                  <span>{event.date}</span>
+                  <span>
+                    {event.address ? (
+                      event.address
+                    ) : !isJoined(event, currentUser) ? (
+                      "Visible to only joined member and after the quota is reached"
+                    ) : !isQuotaFilled(event) ? (
+                      "Visible only after member goal is reached"
+                    ) : (
+                      <a
+                        onClick={(e) => {
+                          setDecryptLocationEventUuid(event.uuid);
+                          setModalConfig(true, { type: "upload-encryption" });
+                        }}
+                      >
+                        Show Location
+                      </a>
+                    )}
+                    {/* Los Angeles, CA, USA */}
+                  </span>
                 </div>
-              </div>
-              <div className="top-margin-set event-list-item-date">
-                <span className="event-list-item-date-icon">
-                  <MapPin />
-                </span>
-                <span>
-                  {event.address ? (
-                    event.address
-                  ) : !isJoined(event, currentUser) ? (
-                    "Visible to only joined member and after the quota is reached"
-                  ) : !isQuotaFilled(event) ? (
-                    "Visible only after member goal is reached"
-                  ) : (
-                    <a
-                      onClick={(e) => {
-                        setDecryptLocationEventUuid(event.uuid);
-                        setModalConfig(true, { type: "upload-encryption" });
-                      }}
-                    >
-                      Show Location
-                    </a>
-                  )}
-                  {/* Los Angeles, CA, USA */}
-                </span>
-              </div>
-              <div className="event-list-item-join-button-container top-margin-set">
-                <button
-                  className="event-list-item-join-button"
-                  disabled={isJoined(event, currentUser) || !currentUser}
-                  onClick={(e) => joinEvent(event)}
-                >
-                  {loader === event.uuid ? (
-                    <Loader
-                      type="Oval"
-                      color="#FFF"
-                      height={16}
-                      width={16}
-                      style={{ display: "flex" }}
-                    />
-                  ) : isJoined(event, currentUser) ? (
-                    "Joined"
-                  ) : (
-                    "Join"
-                  )}
-                </button>
-              </div>
-            </li>
-          ))}
+                <div className="event-list-item-join-button-container top-margin-set">
+                  <button
+                    className="event-list-item-join-button"
+                    disabled={isJoined(event, currentUser) || !currentUser}
+                    onClick={(e) => joinEvent(event)}
+                  >
+                    {loader === event.uuid ? (
+                      <Loader
+                        type="Oval"
+                        color="#FFF"
+                        height={16}
+                        width={16}
+                        style={{ display: "flex" }}
+                      />
+                    ) : isJoined(event, currentUser) ? (
+                      "Joined"
+                    ) : (
+                      "Join"
+                    )}
+                  </button>
+                </div>
+              </li>
+            ))}
         </ul>
+        <div
+          className="event-single-read-more-container bottom-margin-set"
+          onClick={() => history.push("/events")}
+        >
+          <span className="event-single-read-more-button">
+            Explore more events
+          </span>
+        </div>
       </div>
       <div className="footer-section">
         <div className="footer-container">

@@ -210,6 +210,35 @@
         }
       }
     }
+
+    .event-single-read-more-container {
+      display: flex;
+      justify-content: center;
+      position: relative;
+
+      &:before {
+        height: 2px;
+        background: var(--themeColor);
+        content: "";
+        width: 100%;
+        position: absolute;
+        top: 50%;
+      }
+
+      .event-single-read-more-button {
+        background: var(--themeColor);
+        color: var(--whiteColor);
+        padding: 6px 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        z-index: 10;
+
+        &:hover {
+          background: var(--themeColorDark);
+        }
+      }
+    }
   }
 
   .footer-section {

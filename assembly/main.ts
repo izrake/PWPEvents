@@ -18,6 +18,8 @@ import {
   donations,
   localities,
   localityToEventMap,
+  policyMap,
+  Policy,
 } from "./model";
 import { storage, context, logging } from "near-sdk-as";
 
@@ -233,12 +235,28 @@ export function getDonationByUUID(donationUUID: string): Donation {
   return new Donation("", "", "", "");
 }
 
-export function subscribeEvent(uuid: string, sender: string): boolean {
+export function getPolicy(key: string): Policy {
+  let policy = policyMap.get(key);
+  if (policy != null) {
+    return policy;
+  }
+  return new Policy("", "", "");
+}
+
+export function subscribeEvent(
+  uuid: string,
+  sender: string,
+  label: string,
+  policyPubKey: string,
+  policySigKey: string
+): boolean {
   let getEvent = eventsMap.get(uuid);
   if (getEvent != null) {
     getEvent.subscriber.push(sender);
     subscribers.set(uuid, getEvent.subscriber);
     eventsMap.set(uuid, getEvent);
+    let policy = new Policy(label, policyPubKey, policySigKey);
+    policyMap.set(uuid + "_" + sender, policy);
     return true;
   }
   return false;

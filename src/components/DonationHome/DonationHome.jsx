@@ -85,108 +85,120 @@ const DonationHome = () => {
           <h2>Discover Donations</h2>
         </div>
         <ul className="donation-list-container">
-          {donationEvents.map((donationEvent, i) => (
-            <li className="donation-list-item" key={i}>
-              <div onClick={(e) => openDonation(donationEvent)}>
-                <h3 className="donation-list-item-title">
-                  {donationEvent.title}
-                </h3>
-                <p className="donation-list-item-description">
-                  {textVersion(donationEvent.purpose).substring(0, 128)}
-                  ...{" "}
-                  <Link to={`/donations/${donationEvent.uuid}`}>
-                    [Read More]
-                  </Link>
-                </p>
-                <div className="donation-list-item-progress-container">
-                  <div
-                    className="donation-list-item-progress"
-                    style={{
-                      width:
-                        donationEvent.donations.length === 0
-                          ? "0%"
-                          : (Number.parseFloat(
-                              donationEvent.donations
-                                .map((donation) =>
-                                  Number.parseFloat(donation.amount)
-                                )
-                                .reduce((prev, curr) => prev + curr)
-                            ) /
-                              Number.parseFloat(donationEvent.minAmount)) *
-                              100 +
-                            "%",
-                    }}
-                  ></div>
-                </div>
-                <div className="donation-list-item-progress-labels-container">
-                  <span className="donation-list-item-progress-label">
-                    $
-                    {donationEvent.donations.length === 0
-                      ? 0
-                      : Number.parseFloat(
-                          donationEvent.donations
-                            .map((donation) =>
-                              Number.parseFloat(donation.amount)
-                            )
-                            .reduce((prev, curr) => prev + curr)
-                        )}{" "}
-                    donated
-                  </span>
-                  <span className="donation-list-item-progress-label">
-                    ${donationEvent.minAmount} goal
-                  </span>
-                </div>
-                <div className="top-margin-set donation-list-item-date">
-                  <span className="donation-list-item-date-icon">
-                    <Calendar />
-                  </span>
-                  {/* <span>Valid till {donationEvent.validDate}</span> */}
-                  <span>
-                    <Countdown
-                      date={new Date(donationEvent.validDate)}
-                      intervalDelay={0}
-                      precision={0}
-                      renderer={(props) => (
-                        <div>
-                          {props.days} Days {convertTwoDigits(props.hours)}:
-                          {convertTwoDigits(props.minutes)}:
-                          {convertTwoDigits(props.seconds)} Time Left
-                        </div>
+          {donationEvents
+            .filter(
+              (donationEvent) =>
+                new Date(donationEvent.validDate).getTime() >
+                new Date().getTime()
+            )
+            .map((donationEvent, i) => (
+              <li className="donation-list-item" key={i}>
+                <div onClick={(e) => openDonation(donationEvent)}>
+                  <h3 className="donation-list-item-title">
+                    {donationEvent.title}
+                  </h3>
+                  <p className="donation-list-item-description">
+                    {textVersion(donationEvent.purpose).substring(0, 128)}
+                    ...{" "}
+                    <Link to={`/donations/${donationEvent.uuid}`}>
+                      [Read More]
+                    </Link>
+                  </p>
+                  <div className="donation-list-item-progress-container">
+                    <div
+                      className="donation-list-item-progress"
+                      style={{
+                        width:
+                          donationEvent.donations.length === 0
+                            ? "0%"
+                            : (Number.parseFloat(
+                                donationEvent.donations
+                                  .map((donation) =>
+                                    Number.parseFloat(donation.amount)
+                                  )
+                                  .reduce((prev, curr) => prev + curr)
+                              ) /
+                                Number.parseFloat(donationEvent.minAmount)) *
+                                100 +
+                              "%",
+                      }}
+                    ></div>
+                  </div>
+                  <div className="donation-list-item-progress-labels-container">
+                    <span className="donation-list-item-progress-label">
+                      $
+                      {donationEvent.donations.length === 0
+                        ? 0
+                        : Number.parseFloat(
+                            donationEvent.donations
+                              .map((donation) =>
+                                Number.parseFloat(donation.amount)
+                              )
+                              .reduce((prev, curr) => prev + curr)
+                          )}{" "}
+                      donated
+                    </span>
+                    <span className="donation-list-item-progress-label">
+                      ${donationEvent.minAmount} goal
+                    </span>
+                  </div>
+                  <div className="top-margin-set donation-list-item-date">
+                    <span className="donation-list-item-date-icon">
+                      <Calendar />
+                    </span>
+                    {/* <span>Valid till {donationEvent.validDate}</span> */}
+                    <span>
+                      {new Date(donationEvent.validDate).getTime() >
+                      new Date().getTime() ? (
+                        <Countdown
+                          date={new Date(donationEvent.validDate)}
+                          intervalDelay={0}
+                          precision={0}
+                          renderer={(props) => (
+                            <div>
+                              {props.days} Days {convertTwoDigits(props.hours)}:
+                              {convertTwoDigits(props.minutes)}:
+                              {convertTwoDigits(props.seconds)} Time Left
+                            </div>
+                          )}
+                        />
+                      ) : (
+                        "Donation validity has been expired"
                       )}
-                    />
-                  </span>
+                    </span>
+                  </div>
+                  <div className="top-margin-set donation-list-item-date">
+                    <span className="donation-list-item-date-icon">
+                      <Users />
+                    </span>
+                    <span>{donationEvent.donations.length} contributed</span>
+                  </div>
                 </div>
-                <div className="top-margin-set donation-list-item-date">
-                  <span className="donation-list-item-date-icon">
-                    <Users />
-                  </span>
-                  <span>{donationEvent.donations.length} contributed</span>
+                <div className="donation-list-item-join-button-container top-margin-set">
+                  <button
+                    className="donation-list-item-join-button"
+                    disabled={
+                      !isDonationNeeded(donationEvent) ||
+                      (currentUser &&
+                        donationEvent.owner === currentUser.accountId)
+                    }
+                    onClick={(e) => donateHere(donationEvent)}
+                  >
+                    {loader === donationEvent.uuid ? (
+                      <Loader
+                        type="Oval"
+                        color="#FFF"
+                        height={16}
+                        width={16}
+                        style={{ display: "flex" }}
+                      />
+                    ) : (
+                      "Donate"
+                    )}
+                  </button>
                 </div>
-              </div>
-              <div className="donation-list-item-join-button-container top-margin-set">
-                <button
-                  className="donation-list-item-join-button"
-                  disabled={
-                    !isDonationNeeded(donationEvent) ||
-                    donationEvent.owner === currentUser.accountId
-                  }
-                  onClick={(e) => donateHere(donationEvent)}
-                >
-                  {loader === donationEvent.uuid ? (
-                    <Loader
-                      type="Oval"
-                      color="#FFF"
-                      height={16}
-                      width={16}
-                      style={{ display: "flex" }}
-                    />
-                  ) : (
-                    "Donate"
-                  )}
-                </button>
-              </div>
-            </li>
-          ))}
+              </li>
+            ))}
         </ul>
       </div>
     </main>

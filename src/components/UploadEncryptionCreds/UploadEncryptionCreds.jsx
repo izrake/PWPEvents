@@ -12,6 +12,7 @@ const UploadEncryptionCreds = () => {
     decryptLocationEventUuid,
     events,
     selectedEvent,
+    contract,
   } = useContext(StateContext);
   const { setEvents, setModalConfig, setSelectedEvent } = useContext(
     ActionContext
@@ -26,31 +27,45 @@ const UploadEncryptionCreds = () => {
   const handleFileRead = async (evt) => {
     const encDetail = JSON.parse(evt.target.result);
     console.log(encDetail);
-    NuCypherService.decryptData(
-      currentUser.accountId,
-      userDetails.uuid,
-      decryptLocationEventUuid,
-      encDetail.pvt.enc,
-      encDetail.pvt.sig
-    ).then((locationData) => {
-      console.log(locationData);
-      events.forEach((event) => {
-        if (event.uuid === decryptLocationEventUuid) {
-          Object.assign(event, {
-            ...JSON.parse(locationData.data),
+    if (contract) {
+      contract
+        .getPolicy({
+          key: decryptLocationEventUuid + "_" + currentUser.accountId,
+        })
+        .then((policy) => {
+          console.log(policy);
+          NuCypherService.decryptData(
+            currentUser.accountId,
+            userDetails.uuid,
+            decryptLocationEventUuid,
+            encDetail.pvt.enc,
+            encDetail.pvt.sig,
+            policy.policyPubKey,
+            policy.policySigKey,
+            policy.label
+          ).then((locationData) => {
+            console.log(locationData);
+            events.forEach((event) => {
+              if (event.uuid === decryptLocationEventUuid) {
+                Object.assign(event, {
+                  ...JSON.parse(locationData.data),
+                });
+              }
+            });
+            setEvents(events);
+            if (
+              selectedEvent &&
+              selectedEvent.uuid === decryptLocationEventUuid
+            ) {
+              Object.assign(selectedEvent, {
+                ...JSON.parse(locationData.data),
+              });
+            }
+            setSelectedEvent(selectedEvent);
+            setModalConfig(false, { type: "" });
           });
-        }
-      });
-      setEvents(events);
-      if (selectedEvent && selectedEvent.uuid === decryptLocationEventUuid) {
-        Object.assign(selectedEvent, {
-          ...JSON.parse(locationData.data),
         });
-      }
-      setSelectedEvent(selectedEvent);
-      setModalConfig(false, { type: "" });
-    });
-    // setChart(chartFlow);
+    }
   };
 
   return (

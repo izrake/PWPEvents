@@ -56,12 +56,16 @@ const EventSingle = () => {
       userDetails.publicEncKey,
       userDetails.publicSigKey
     )
-      .then(() => {
+      .then((data) => {
+        console.log(data);
         contract
           .subscribeEvent(
             {
               uuid: event.uuid,
               sender: currentUser.accountId,
+              label: data.label,
+              policyPubKey: data.policy_pub_key,
+              policySigKey: data.policy_sig_key,
             },
             BOATLOAD_OF_GAS
           )
@@ -345,19 +349,24 @@ const EventSingle = () => {
                         </span>
                         {/* <span>Valid till {donationEvent.validDate}</span> */}
                         <span>
-                          <Countdown
-                            date={new Date(donationEvent.validDate)}
-                            intervalDelay={0}
-                            precision={0}
-                            renderer={(props) => (
-                              <div>
-                                {props.days} Days{" "}
-                                {convertTwoDigits(props.hours)}:
-                                {convertTwoDigits(props.minutes)}:
-                                {convertTwoDigits(props.seconds)} Time Left
-                              </div>
-                            )}
-                          />
+                          {new Date(donationEvent.validDate).getTime() >
+                          new Date().getTime() ? (
+                            <Countdown
+                              date={new Date(donationEvent.validDate)}
+                              intervalDelay={0}
+                              precision={0}
+                              renderer={(props) => (
+                                <div>
+                                  {props.days} Days{" "}
+                                  {convertTwoDigits(props.hours)}:
+                                  {convertTwoDigits(props.minutes)}:
+                                  {convertTwoDigits(props.seconds)} Time Left
+                                </div>
+                              )}
+                            />
+                          ) : (
+                            "Donation validity has been expired"
+                          )}
                         </span>
                       </div>
                       <div className="top-margin-set donation-list-item-date">

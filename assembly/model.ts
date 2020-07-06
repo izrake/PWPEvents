@@ -82,6 +82,15 @@ export class Donation {
   ) {}
 }
 
+@nearBindgen
+export class Policy {
+  constructor(
+    public label: string,
+    public policyPubKey: string,
+    public policySigKey: string
+  ) {}
+}
+
 export const userMap = new PersistentMap<string, User>("a");
 
 export const eventsMap = new PersistentMap<string, EventRegistration>("b");
@@ -92,6 +101,8 @@ export const donationEventMap = new PersistentMap<
 >("c");
 
 export const donationMap = new PersistentMap<string, Donation>("d");
+
+export const policyMap = new PersistentMap<string, Policy>("n");
 
 export const users = new PersistentVector<User>("e");
 
