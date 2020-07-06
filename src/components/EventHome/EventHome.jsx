@@ -17,7 +17,7 @@ const BOATLOAD_OF_GAS = Big(1)
   .toFixed();
 
 // set Google Maps Geocoding API for purposes of quota management. Its optional but recommended.
-GeoCode.setApiKey("AIzaSyAotB8hkeaYU0roIQfylNmPhkJ2oLu2ajI");
+GeoCode.setApiKey("{useyourkey}");
 
 // set response language. Defaults to english.
 GeoCode.setLanguage("en");
