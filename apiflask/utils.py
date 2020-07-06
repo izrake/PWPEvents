@@ -11,7 +11,7 @@ from nucypher.config.characters import AliceConfiguration
 from nucypher.config.constants import TEMPORARY_DOMAIN
 from umbral.keys import UmbralPrivateKey
 
-SEEDNODE_URI = "localhost:10151"
+SEEDNODE_URI = "127.0.0.1:10151"
 def nocache(view):
     @wraps(view)
     def no_cache(*args, **kwargs):

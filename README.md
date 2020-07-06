@@ -57,6 +57,15 @@ Once Flask API and Ursula starts running, it's time to run our UI
  - Run `buildui`
  - React app will start on localhost port `1234`
 
+ ## Test it by yourself
+ Note: Our server running cost is much so we have decided to run the server for the specific timings
+ If you need server up ping either @rekpero#3898 or @prashantmaurya#6839
+ [PWPEvents](pwpevents.centralus.cloudapp.azure.com) website http://pwpevents.centralus.cloudapp.azure.com/
+ 
+ ## Special Thanks
+ IlliaAtNear and Mike Purvis for extending their helping hands when we ran into multiple NEAR protocol issue.
+ Kprasch and maclane for making sure all active query resolution on the nucypher discord groups
+ 
  
 
 

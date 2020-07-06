@@ -30,7 +30,7 @@ def welcome():
     return "welcome to zkDonation"
 
 
-@app.route("/encrypt/",methods=["POST"])
+@app.route("/api/encrypt/",methods=["POST"])
 @nocache
 def encrypt_location():
     req = request.get_json()
@@ -40,7 +40,7 @@ def encrypt_location():
 
     return  make_response(req)
 
-@app.route("/generate_keys/", methods=["POST"])
+@app.route("api/generate_keys/", methods=["POST"])
 def generate_keys():
     req = request.get_json()
     sub_pub,sub_pvt = generate_subscribers_keys(req["user_uuid"])
@@ -51,13 +51,13 @@ def generate_keys():
     }
     return make_response(jsonData)
 
-@app.route("/assign_policy/",methods=["POST"])
+@app.route("api/assign_policy/",methods=["POST"])
 def assign_policy():
     req = request.get_json()
     res = assignPolicyToSubscriber(req["subscriber"], req["sub_uuid"], req["event_uuid"], req["public_key_user"], req["public_sign_user"])
     return  make_response(res)
 
-@app.route("/decrypt_data/",methods=["POST"])
+@app.route("api/decrypt_data/",methods=["POST"])
 def decrypt_data():
     req = request.get_json()
     text = createBobToResolveData(req["sub_uuid"], req["subscriber"], req["event_uuid"], req["sub_private_key"], req["sub_signer_key"]
@@ -135,7 +135,7 @@ def assignPolicyToSubscriber(subsriber,sub_uuid,event_uuid,publicEnc, publicSign
 
 
 def createBobToResolveData(sub_uuid,sender,event_uuid,sub_private_key,sub_signer_key, policy_pub_key,policy_sign_key,label):
-    SEEDNODE_URI = "localhost:10151"
+    SEEDNODE_URI = "127.0.0.1:10151"
     # TODO: path joins?
     TEMP_DOCTOR_DIR = "{}/doctor-files".format(os.path.dirname(os.path.abspath(__file__)))
 
