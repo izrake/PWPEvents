@@ -60,7 +60,8 @@ def assign_policy():
 @app.route("/decrypt_data/",methods=["POST"])
 def decrypt_data():
     req = request.get_json()
-    text = createBobToResolveData(req["sub_uuid"], req["subscriber"], req["event_uuid"], req["sub_private_key"], req["sub_signer_key"])
+    text = createBobToResolveData(req["sub_uuid"], req["subscriber"], req["event_uuid"], req["sub_private_key"], req["sub_signer_key"]
+                                  ,req["policy_pub_key"],req["policy_sign_key"],req["label"])
 
     dec_data = {
         'data':text
@@ -125,19 +126,15 @@ def assignPolicyToSubscriber(subsriber,sub_uuid,event_uuid,publicEnc, publicSign
     print(ourCurrentSubscriber)
 
     policy_info = {
-        "policy_pubkey": policy.public_key.to_bytes().hex(),
-        "alice_sig_pubkey": bytes(alicia.stamp).hex(),
+        "policy_pub_key": policy.public_key.to_bytes().hex(),
+        "policy_sig_key": bytes(alicia.stamp).hex(),
         "label": label.decode("utf-8"),
     }
-
-    filename = sub_uuid + '-'+ subsriber + '.json'
-    with open(filename, 'w') as f:
-        json.dump(policy_info, f)
 
     return policy_info
 
 
-def createBobToResolveData(sub_uuid,sender,event_uuid,sub_private_key,sub_signer_key):
+def createBobToResolveData(sub_uuid,sender,event_uuid,sub_private_key,sub_signer_key, policy_pub_key,policy_sign_key,label):
     SEEDNODE_URI = "localhost:10151"
     # TODO: path joins?
     TEMP_DOCTOR_DIR = "{}/doctor-files".format(os.path.dirname(os.path.abspath(__file__)))
@@ -174,23 +171,19 @@ def createBobToResolveData(sub_uuid,sender,event_uuid,sub_private_key,sub_signer
 
     print("Doctor = ", doctor)
 
-    # get alicia policy
-    filename = sub_uuid + '-' + sender + '.json'
-    with open(filename, 'r') as f:
-        policy_data = json.load(f)
 
-    policy_pubkey = UmbralPublicKey.from_bytes(bytes.fromhex(policy_data["policy_pubkey"]))
-    alices_sig_pubkey = UmbralPublicKey.from_bytes(bytes.fromhex(policy_data["alice_sig_pubkey"]))
-    label = policy_data["label"].encode()
+    policy_pub_keys = UmbralPublicKey.from_bytes(bytes.fromhex(policy_pub_key))
+    policy_sign_keys = UmbralPublicKey.from_bytes(bytes.fromhex(policy_sign_key))
+    label = label.encode()
 
     print("The Doctor joins policy for label '{}'".format(label.decode("utf-8")))
-    doctor.join_policy(label, alices_sig_pubkey)
+    doctor.join_policy(label, policy_sign_keys)
 
     data = msgpack.load(open(event_uuid + ".msgpack", "rb"), raw=False)
     message_kits = UmbralMessageKit.from_bytes(data['data'])
     data_source = Enrico.from_public_keys(
         verifying_key=data['data_source'],
-        policy_encrypting_key=policy_pubkey
+        policy_encrypting_key=policy_pub_keys
     )
 
     try:
@@ -198,7 +191,7 @@ def createBobToResolveData(sub_uuid,sender,event_uuid,sub_private_key,sub_signer
                 message_kits,
                 label=label,
                 enrico=data_source,
-                alice_verifying_key=alices_sig_pubkey
+                alice_verifying_key=policy_sign_keys
             )
 
         plaintext = msgpack.loads(retrieved_plaintexts[0],raw=False)

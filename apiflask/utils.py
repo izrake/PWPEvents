@@ -68,16 +68,10 @@ def generate_subscribers_keys(uuid):
         'sig': sig_privkey.to_bytes().hex(),
     }
 
-    with open(subscriberPrivateKey, 'w') as f:
-        json.dump(subscriber_privkeys, f)
-
     enc_pubkey = enc_privkey.get_pubkey()
     sig_pubkey = sig_privkey.get_pubkey()
     subscriber_pubkeys = {
         'enc': enc_pubkey.to_bytes().hex(),
         'sig': sig_pubkey.to_bytes().hex()
     }
-    with open(subscriberPublicKey, 'w') as f:
-        json.dump(subscriber_pubkeys, f)
-
     return subscriber_pubkeys,subscriber_privkeys
