@@ -30,7 +30,7 @@ def welcome():
     return "welcome to zkDonation"
 
 
-@app.route("api/encrypt/",methods=["POST"])
+@app.route("/api/encrypt/",methods=["POST"])
 @nocache
 def encrypt_location():
     req = request.get_json()
