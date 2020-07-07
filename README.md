@@ -62,10 +62,11 @@ Once Flask API and Ursula starts running, it's time to run our UI
  If you need server up ping either @rekpero#3898 or @prashantmaurya#6839
  [PWPEvents](pwpevents.centralus.cloudapp.azure.com) website http://pwpevents.centralus.cloudapp.azure.com/
  
+ ## Meet PWPEvents 
+ [https://www.loom.com/share/62970bc5955f49e78f40122401c8373a)](https://www.loom.com/share/62970bc5955f49e78f40122401c8373a)
+ 
  ## Special Thanks
  IlliaAtNear and Mike Purvis for extending their helping hands when we ran into multiple NEAR protocol issue.
  Kprasch and maclane for making sure all active query resolution on the nucypher discord groups
  
  
-
-
