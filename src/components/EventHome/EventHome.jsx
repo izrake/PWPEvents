@@ -32,7 +32,10 @@ const EventHome = () => {
   );
 
   const [loader, setLoader] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState({
+    value: "all",
+    label: "All Events",
+  });
   const [options, setOptions] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [searchEvents, setSearchEvents] = useState([]);
@@ -84,10 +87,14 @@ const EventHome = () => {
     if (contract) {
       contract.getLocalities().then((data) => {
         console.log("Data", data);
-        const filteredLocality = data
+        let filteredLocality = data
           .filter((loc, i) => data.indexOf(loc) === i)
           .filter((loc) => loc !== "")
           .map((loc) => ({ value: loc, label: loc }));
+        filteredLocality = [
+          { value: "all", label: "All Events" },
+          ...filteredLocality,
+        ];
         console.log(filteredLocality);
         setOptions(filteredLocality);
       });
@@ -136,18 +143,25 @@ const EventHome = () => {
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);
     if (contract) {
-      contract
-        .getEventsByLocality({ locality: selectedOption.value })
-        .then((eventUUIDs) => {
-          Promise.all(
-            eventUUIDs.map((eventUUID) =>
-              contract.getEventByUUID({ uuid: eventUUID })
-            )
-          ).then((events) => {
-            setEvents(events);
-            setSearchEvents(events);
+      if (selectedOption.value !== "all") {
+        contract
+          .getEventsByLocality({ locality: selectedOption.value })
+          .then((eventUUIDs) => {
+            Promise.all(
+              eventUUIDs.map((eventUUID) =>
+                contract.getEventByUUID({ uuid: eventUUID })
+              )
+            ).then((events) => {
+              setEvents(events);
+              setSearchEvents(events);
+            });
           });
+      } else {
+        contract.getEvents().then((events) => {
+          setEvents(events);
+          setSearchEvents(events);
         });
+      }
     }
   };
 

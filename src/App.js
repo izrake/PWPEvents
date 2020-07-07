@@ -32,6 +32,10 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
           console.log(user);
           if (!user.isRegistered) {
             setModalConfig(true, { type: "registration" });
+          } else {
+            if (localStorage.getItem("userEncCreds") !== null) {
+              setModalConfig(true, { type: "user-encryption" });
+            }
           }
           setUserDetails(user);
         });

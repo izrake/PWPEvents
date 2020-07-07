@@ -71,7 +71,9 @@ export const AppProvider = (props) => {
       wallet: null,
       openModal: false,
       modalConfig: { type: "" },
-      userEncryptionCreds: null,
+      userEncryptionCreds: localStorage.getItem("userEncCreds")
+        ? JSON.parse(localStorage.getItem("userEncCreds"))
+        : null,
       userDetails: null,
       decryptLocationEventUuid: "",
       events: [],
@@ -112,6 +114,11 @@ export const AppProvider = (props) => {
         dispatch({ type: "SET_USER_DETAILS", userDetails });
       },
       setUserEncryptionCreds: (userEncryptionCreds) => {
+        localStorage.setItem(
+          "userEncCreds",
+          JSON.stringify(userEncryptionCreds)
+        );
+
         dispatch({ type: "SET_USER_ENCRYPTION_CREDS", userEncryptionCreds });
       },
       setDecryptLocationEventUuid: (decryptLocationEventUuid) => {

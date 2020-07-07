@@ -18,7 +18,6 @@ const Header = () => {
     wallet.signOut();
     window.location = "/";
   };
-  console.log(currentUser);
   return (
     <header className="header" id="home">
       {location.pathname === "/" && (

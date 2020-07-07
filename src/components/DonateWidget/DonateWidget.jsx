@@ -1,5 +1,5 @@
 import "regenerator-runtime/runtime";
-import React, { useCallback, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { StateContext, ActionContext } from "../../hooks";
 import { Heart } from "react-feather";
 import Loader from "react-loader-spinner";
@@ -38,26 +38,29 @@ const DonateWidget = () => {
         <div
           className="donate-widget-progress"
           style={{
-            width:
-              (Number.parseFloat(
-                selectedDonationForDonate.donations
-                  .map((donation) => Number.parseFloat(donation.amount))
-                  .reduce((prev, curr) => prev + curr)
-              ) /
-                Number.parseFloat(selectedDonationForDonate.minAmount)) *
-                100 +
-              "%",
+            width: selectedDonationForDonate.donations.length
+              ? (Number.parseFloat(
+                  selectedDonationForDonate.donations
+                    .map((donation) => Number.parseFloat(donation.amount))
+                    .reduce((prev, curr) => prev + curr)
+                ) /
+                  Number.parseFloat(selectedDonationForDonate.minAmount)) *
+                  100 +
+                "%"
+              : "0%",
           }}
         ></div>
       </div>
       <div className="donate-widget-progress-labels-container">
         <span className="donate-widget-progress-label">
           $
-          {Number.parseFloat(
-            selectedDonationForDonate.donations
-              .map((donation) => Number.parseFloat(donation.amount))
-              .reduce((prev, curr) => prev + curr)
-          )}{" "}
+          {selectedDonationForDonate.donations.length === 0
+            ? 0
+            : Number.parseFloat(
+                selectedDonationForDonate.donations
+                  .map((donation) => Number.parseFloat(donation.amount))
+                  .reduce((prev, curr) => prev + curr)
+              )}{" "}
           donated
         </span>
         <span className="donate-widget-progress-label">
@@ -71,7 +74,7 @@ const DonateWidget = () => {
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
       />
-      <button className="donate-buttons bottom-margin-set" onnClick={donate}>
+      <button className="donate-buttons bottom-margin-set" onClick={donate}>
         {loader ? (
           <Loader
             type="Oval"

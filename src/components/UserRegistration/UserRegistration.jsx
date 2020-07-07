@@ -29,40 +29,71 @@ const UserRegistration = () => {
 
   const onSubmit = async () => {
     setLoader(true);
-    try {
-      const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
-      const res = await NuCypherService.getEncryptionKey(randomID);
-      // console.log("Testing", res);
-      contract
-        .addUser(
-          {
-            uuid: randomID,
-            firstName: firstName,
-            lastName: lastName,
-            dateOfBirth: dateOfBirth.toString(),
-            emailId: email,
-            phoneNumber: phoneNumber,
-            sender: currentUser.accountId,
-            senderPublicEncKey: res.pub.enc,
-            senderPublicSigKey: res.pub.sig,
+    const randomID = (Math.random() * 1e32).toString(36).substring(0, 10);
+    NuCypherService.getEncryptionKey(randomID)
+      .then((res) => {
+        setUserEncryptionCreds(res);
+        contract
+          .addUser(
+            {
+              uuid: randomID,
+              firstName: firstName,
+              lastName: lastName,
+              dateOfBirth: dateOfBirth.toString(),
+              emailId: email,
+              phoneNumber: phoneNumber,
+              sender: currentUser.accountId,
+              senderPublicEncKey: res.pub.enc,
+              senderPublicSigKey: res.pub.sig,
+            },
+            BOATLOAD_OF_GAS
+          )
+          .then((data) => {
+            console.log(data);
+            contract
+              .getUserBySender({
+                currentUser: currentUser.accountId.toString(),
+              })
+              .then((user) => {
+                console.log(user);
+                setUserDetails(user);
+                setModalConfig(true, { type: "user-encryption" });
+                setLoader(false);
+              })
+              .catch((err) => {
+                console.error(err);
+                store.addNotification({
+                  title: "Error!",
+                  message: err.message,
+                  type: "danger",
+                  insert: "top",
+                  container: "top-right",
+                  animationIn: ["animated", "fadeIn"],
+                  animationOut: ["animated", "fadeOut"],
+                  dismiss: {
+                    duration: 5000,
+                    onScreen: true,
+                  },
+                });
+              });
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+        store.addNotification({
+          title: "Error!",
+          message: err.message,
+          type: "danger",
+          insert: "top",
+          container: "top-right",
+          animationIn: ["animated", "fadeIn"],
+          animationOut: ["animated", "fadeOut"],
+          dismiss: {
+            duration: 5000,
+            onScreen: true,
           },
-          BOATLOAD_OF_GAS
-        )
-        .then((data) => {
-          console.log(data);
-          contract
-            .getUserBySender({ currentUser: currentUser.accountId.toString() })
-            .then((user) => {
-              console.log(user);
-              setUserDetails(user);
-              setUserEncryptionCreds(res);
-              setModalConfig(true, { type: "user-encryption" });
-              setLoader(false);
-            });
         });
-    } catch (err) {
-      console.error(err);
-    }
+      });
   };
 
   return (
