@@ -2,7 +2,7 @@ const ROOT_URL = "http://localhost:5000";
 
 export default class NuCypherService {
   static getEncryptionKey = async (user_uuid) => {
-    return fetch(`${ROOT_URL}/generate_keys/`, {
+    return fetch(`${ROOT_URL}/api/generate_keys/`, {
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
@@ -16,7 +16,7 @@ export default class NuCypherService {
   };
 
   static encryptData = async (data_enc, sender, event_uuid) => {
-    return fetch(`${ROOT_URL}/encrypt/`, {
+    return fetch(`${ROOT_URL}/api/encrypt/`, {
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
@@ -38,7 +38,7 @@ export default class NuCypherService {
     public_key_user,
     public_sign_user
   ) => {
-    return fetch(`${ROOT_URL}/assign_policy/`, {
+    return fetch(`${ROOT_URL}/api/assign_policy/`, {
       headers: { "Content-Type": "application/json; charset=utf-8" },
       method: "POST",
       body: JSON.stringify({
@@ -63,7 +63,7 @@ export default class NuCypherService {
     policy_sign_key,
     label
   ) => {
-    return fetch(`${ROOT_URL}/decrypt_data/`, {
+    return fetch(`${ROOT_URL}/api/decrypt_data/`, {
       headers: { "Content-Type": "application/json; charset=utf-8" },
       method: "POST",
       body: JSON.stringify({
