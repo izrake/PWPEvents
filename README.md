@@ -1,8 +1,8 @@
-# PWPEvents
-
 <p align="center">
 	<img src="https://github.com/izrake/PWPEvents/blob/master/screenshots/banner.png" alt="weve showcase">
 </p>
+
+# PWPEvents
 
 ## Idea
 
