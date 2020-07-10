@@ -1,5 +1,9 @@
 # PWPEvents
 
+<p align="center">
+	<img src="https://github.com/izrake/PWPEvents/blob/master/screenshots/banner.png" alt="weve showcase">
+</p>
+
 ## Idea
 
 Provide single platform for protest organizers to create events and allow others to join the event.
