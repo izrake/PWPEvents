@@ -4,9 +4,7 @@
 
 # PWPEvents
 
-## Idea
-
-Provide single platform for protest organizers to create events and allow others to join the event.
+Provide single platform for protest organizers to create events and allow others to join the event without publishing the location.
 
 ## Why PWPEvents?
 
