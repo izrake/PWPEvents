@@ -46,7 +46,7 @@
     "draftjs-to-html": "^0.9.1",
     "env-cmd": "^10.1.0",
     "ethereum-blockies-base64": "^1.0.2",
-    "moment": "^2.26.0",
+    "moment": "^2.29.4",
     "near-api-js": "^0.25.1",
     "react": "^16.13.1",
     "react-anchor-link-smooth-scroll": "^1.0.12",
